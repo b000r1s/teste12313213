@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clarity — Sala de compartilhamento</title>
+<style>
+:root {
+  --site-primary: #6C5CE7;
+  --site-on-primary: #FFFFFF;
+  --site-secondary: #172033;
+  --site-on-secondary: #FFFFFF;
+  --site-background: #F5F6FB;
+  --site-on-background: #171B2B;
+  --site-font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --site-font-heading: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --site-heading-scale: 1;
+  --site-spacing-scale: 1;
+  --site-radius-scale: 1;
+  --site-decoration-opacity: 1;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  font-family: var(--site-font-body);
+  background: light-dark(#F5F6FB, #0B0E16);
+  color: light-dark(#171B2B, #F2F4FF);
+}
+#app {
+  min-height: 100vh;
+  width: 100%;
+  border-radius: 0;
+  background-color: var(--site-background);
+  color: var(--site-on-background);
+  position: relative;
+  overflow: hidden;
+}
+button, input { font: inherit; }
+button { cursor: pointer; }
+.topbar {
+  height: 76px; display:flex; align-items:center; justify-content:space-between;
+  padding: 0 calc(36px * var(--site-spacing-scale));
+  border-bottom: 1px solid color-mix(in srgb, var(--site-on-background) 9%, transparent);
+  background: color-mix(in srgb, var(--site-background) 92%, white);
+  position: relative; z-index: 2;
+}
+.brand { display:flex; align-items:center; gap:12px; font-weight:800; letter-spacing:-.04em; font-size:21px; }
+.logo { width:34px; height:34px; border-radius:11px; display:grid; place-items:center; color:var(--site-on-primary); background:var(--site-primary); box-shadow:0 5px 16px color-mix(in srgb, var(--site-primary) 28%, transparent); }
+.logo svg { width:20px; }
+.top-actions { display:flex; align-items:center; gap:10px; }
+.pill { display:flex; align-items:center; gap:8px; border:1px solid color-mix(in srgb, var(--site-on-background) 12%, transparent); border-radius:999px; padding:9px 13px; font-size:12px; font-weight:650; color:inherit; background:transparent; }
+.dot { width:7px; height:7px; border-radius:50%; background:#D89B30; }
+main { max-width:1240px; margin:0 auto; padding:38px 28px 48px; }
+.intro { display:flex; justify-content:space-between; align-items:flex-end; gap:24px; margin-bottom:26px; }
+.eyebrow { text-transform:uppercase; letter-spacing:.13em; font-size:10px; font-weight:800; color:var(--site-primary); margin-bottom:11px; }
+h1 { font-family:var(--site-font-heading); font-size:calc(34px * var(--site-heading-scale)); letter-spacing:-.055em; line-height:1.08; margin:0 0 10px; }
+.sub { color:color-mix(in srgb, var(--site-on-background) 58%, transparent); font-size:14px; line-height:1.6; margin:0; max-width:570px; }
+.room-code { display:flex; align-items:center; gap:12px; padding:12px 15px; border:1px solid color-mix(in srgb, var(--site-on-background) 12%, transparent); border-radius:14px; background:color-mix(in srgb, var(--site-background) 80%, white); white-space:nowrap; }
+.room-code small { display:block; color:color-mix(in srgb, var(--site-on-background) 55%, transparent); font-size:10px; margin-bottom:3px; }
+.room-code strong { font-size:13px; letter-spacing:.12em; }
+.copy { border:0; background:transparent; color:var(--site-primary); padding:4px; display:grid; place-items:center; }
+.workspace { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:18px; align-items:stretch; }
+.stage-card { background:var(--site-secondary); color:var(--site-on-secondary); border-radius:calc(22px * var(--site-radius-scale)); overflow:hidden; box-shadow:0 20px 55px rgba(20,24,45,.12); }
+.stage-head { display:flex; justify-content:space-between; align-items:center; padding:17px 20px; border-bottom:1px solid rgba(255,255,255,.1); }
+.stage-label { display:flex; align-items:center; gap:9px; font-size:12px; font-weight:700; }
+.live { display:flex; align-items:center; gap:7px; font-size:10px; color:#A8B2CA; }
+.live i { width:6px; height:6px; background:#44D7A1; border-radius:50%; box-shadow:0 0 0 4px rgba(68,215,161,.12); }
+.stage { min-height:370px; aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; position:relative; padding:24px; background:radial-gradient(ellipse at 50% 42%, #252D48 0%, #171D30 52%, #111625 100%); }
+.stage:before { content:""; position:absolute; inset:0; opacity:var(--site-decoration-opacity); background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px); background-size:38px 38px; pointer-events:none; }
+.empty-state { position:relative; text-align:center; max-width:340px; }
+.screen-icon { width:68px; height:68px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); border-radius:20px; display:grid; place-items:center; margin:0 auto 20px; color:#C7C9FF; }
+.screen-icon svg { width:31px; height:31px; }
+.empty-state h2 { font-size:19px; letter-spacing:-.03em; margin:0 0 8px; }
+.empty-state p { color:#A4ADC5; font-size:12px; line-height:1.65; margin:0 0 18px; }
+.primary { background:var(--site-primary); color:var(--site-on-primary); border:0; border-radius:11px; padding:12px 17px; font-size:12px; font-weight:750; box-shadow:0 7px 18px color-mix(in srgb, var(--site-primary) 28%, transparent); transition:transform .15s, filter .15s; }
+.primary:hover { filter:brightness(1.08); transform:translateY(-1px); }
+.stage-foot { display:flex; justify-content:space-between; align-items:center; padding:13px 18px; background:#131929; border-top:1px solid rgba(255,255,255,.08); gap:12px; }
+.participant { display:flex; align-items:center; gap:9px; color:#AAB3C9; font-size:11px; }
+.avatar { width:25px; height:25px; display:grid; place-items:center; border-radius:8px; background:#343B5C; color:#DAD9FF; font-size:10px; font-weight:800; }
+.controls { display:flex; align-items:center; gap:8px; }
+.control { width:36px; height:36px; border-radius:11px; border:1px solid rgba(255,255,255,.13); background:rgba(255,255,255,.06); color:#E8EBF8; display:grid; place-items:center; }
+.control svg { width:16px; height:16px; }
+.control.active { background:#E84D65; border-color:#E84D65; color:white; }
+.control.share { width:auto; display:flex; gap:7px; padding:0 12px; font-size:11px; font-weight:700; background:var(--site-primary); border-color:var(--site-primary); }
+.sidebar { display:flex; flex-direction:column; gap:14px; }
+.panel { border:1px solid color-mix(in srgb, var(--site-on-background) 10%, transparent); background:color-mix(in srgb, var(--site-background) 80%, white); border-radius:calc(18px * var(--site-radius-scale)); padding:18px; }
+.panel-title { font-size:12px; font-weight:800; margin:0 0 14px; display:flex; justify-content:space-between; align-items:center; }
+.count { font-size:10px; font-weight:700; color:color-mix(in srgb, var(--site-on-background) 50%, transparent); background:color-mix(in srgb, var(--site-on-background) 6%, transparent); border-radius:7px; padding:4px 7px; }
+.person { display:flex; align-items:center; gap:10px; padding:9px 0; }
+.person + .person { border-top:1px solid color-mix(in srgb, var(--site-on-background) 7%, transparent); }
+.person .avatar { width:32px; height:32px; border-radius:10px; background:#E8E5FF; color:#5B4BC4; }
+.person-info { flex:1; min-width:0; }
+.person-info strong { display:block; font-size:11px; }
+.person-info span { display:block; font-size:10px; color:color-mix(in srgb, var(--site-on-background) 50%, transparent); margin-top:3px; }
+.mic-status { font-size:10px; color:#28A879; font-weight:700; }
+.invite { width:100%; display:flex; align-items:center; justify-content:center; gap:8px; border:1px dashed color-mix(in srgb, var(--site-primary) 42%, transparent); background:color-mix(in srgb, var(--site-primary) 6%, transparent); color:var(--site-primary); border-radius:10px; padding:11px; font-size:11px; font-weight:750; margin-top:12px; }
+.audio-row { display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:11px; margin:12px 0; }
+.audio-row span { color:color-mix(in srgb, var(--site-on-background) 55%, transparent); }
+select { max-width:130px; border:1px solid color-mix(in srgb, var(--site-on-background) 14%, transparent); background:transparent; color:inherit; border-radius:8px; padding:7px; font-size:10px; }
+.meter { height:5px; border-radius:99px; background:color-mix(in srgb, var(--site-on-background) 9%, transparent); overflow:hidden; margin-top:8px; }
+.meter div { width:0%; height:100%; background:#35C995; transition:width .08s; }
+.tip { font-size:10px; color:color-mix(in srgb, var(--site-on-background) 53%, transparent); line-height:1.6; margin:14px 0 0; }
+.bottom { display:flex; justify-content:space-between; gap:20px; align-items:center; margin-top:20px; color:color-mix(in srgb, var(--site-on-background) 48%, transparent); font-size:10px; }
+.bottom strong { color:var(--site-primary); }
+.toast { position:fixed; left:50%; bottom:24px; transform:translate(-50%,20px); opacity:0; pointer-events:none; background:#171D30; color:#fff; padding:12px 18px; border-radius:12px; font-size:12px; box-shadow:0 12px 35px #0003; transition:.25s; z-index:10; }
+.toast.show { opacity:1; transform:translate(-50%,0); }
+@media (max-width:900px) {
+  .workspace { grid-template-columns:1fr; }
+  .sidebar { display:grid; grid-template-columns:1fr 1fr; }
+  .intro { align-items:flex-start; flex-direction:column; }
+}
+@media (max-width:580px) {
+  .topbar { padding:0 17px; height:65px; }
+  .top-actions .pill { display:none; }
+  main { padding:28px 15px 35px; }
+  h1 { font-size:calc(29px * var(--site-heading-scale)); }
+  .room-code { width:100%; justify-content:space-between; }
+  .stage { min-height:290px; aspect-ratio:4/3; }
+  .stage-foot { flex-wrap:wrap; }
+  .sidebar { display:flex; }
+  .bottom { flex-direction:column; align-items:flex-start; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M7 9l3 3 7-4"/></svg></div>
+      clarity<span style="color:var(--site-primary)">.</span>
+    </div>
+    <div class="top-actions">
+      <div class="pill"><span class="dot"></span><span id="connectionText">Sala pronta</span></div>
+      <button class="pill" id="leaveBtn" style="color:#D94C62">Sair da sala ↗</button>
+    </div>
+  </header>
+  <main>
+    <section class="intro">
+      <div>
+        <div class="eyebrow">Seu espaço privado</div>
+        <h1>Compartilhe. Converse.<br>Esteja presente.</h1>
+        <p class="sub">Uma sala simples para duas pessoas, com compartilhamento de tela e áudio pensado para conversas claras.</p>
+      </div>
+      <div class="room-code">
+        <div><small>CÓDIGO DA SALA</small><strong id="roomCode">CLAR-482-916</strong></div>
+        <button class="copy" id="copyCode" aria-label="Copiar código"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg></button>
+      </div>
+    </section>
+    <section class="workspace">
+      <div class="stage-card">
+        <div class="stage-head">
+          <div class="stage-label"><span style="color:#A9A3FF">◉</span> Tela compartilhada</div>
+          <div class="live"><i></i><span id="screenStatus">Aguardando compartilhamento</span></div>
+        </div>
+        <div class="stage" id="stage">
+          <div class="empty-state" id="emptyState">
+            <div class="screen-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="3.5" width="19" height="14" rx="2"/><path d="M8 21h8M12 17.5V21M7 8l3 3 7-4"/></svg></div>
+            <h2>Sua tela, em alta qualidade</h2>
+            <p>Compartilhe uma janela, uma aba ou a tela inteira. O navegador permitirá que você escolha o que deseja mostrar.</p>
+            <button class="primary" id="startShare">▣ &nbsp; Compartilhar minha tela</button>
+          </div>
+          <video id="screenVideo" autoplay playsinline style="display:none;width:100%;height:100%;max-height:600px;object-fit:contain;position:relative;z-index:1"></video>
+        </div>
+        <div class="stage-foot">
+          <div class="participant"><div class="avatar">V</div><span id="selfName">Você · neste dispositivo</span></div>
+          <div class="controls">
+            <button class="control" id="micBtn" title="Ativar microfone" aria-label="Microfone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5m-4 0h8"/></svg></button>
+            <button class="control" id="camBtn" title="Ativar câmera (opcional)" aria-label="Câmera"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg></button>
+            <button class="control share" id="shareBtn">▣ <span>Compartilhar</span></button>
+          </div>
+        </div>
+      </div>
+      <aside class="sidebar">
+        <div class="panel">
+          <h3 class="panel-title">Participantes <span class="count" id="participantCount">1 / 2</span></h3>
+          <div class="person">
+            <div class="avatar">V</div>
+            <div class="person-info"><strong>Você</strong><span>Host da sala</span></div>
+            <span class="mic-status" id="selfMicStatus">Mic desligado</span>
+          </div>
+          <div class="person">
+            <div class="avatar" style="background:#E4F5EE;color:#198A65">?</div>
+            <div class="person-info"><strong>Aguardando alguém</strong><span>Envie o convite para entrar</span></div>
+          </div>
+          <button class="invite" id="inviteBtn">＋ &nbsp; Copiar convite da sala</button>
+        </div>
+        <div class="panel">
+          <h3 class="panel-title">Áudio <span class="count">HD ready</span></h3>
+          <div class="audio-row"><span>Microfone</span><select id="micSelect"><option value="">Padrão do sistema</option></select></div>
+          <div class="audio-row"><span>Saída de áudio</span><select id="outputSelect"><option value="">Padrão do sistema</option></select></div>
+          <div class="audio-row"><span>Entrada de voz</span><strong id="audioLevel" style="font-size:10px;color:#28A879">Desativada</strong></div>
+          <div class="meter"><div id="meterFill"></div></div>
+          <p class="tip">Dica: use fones de ouvido para reduzir eco e melhorar a clareza da conversa.</p>
+        </div>
+      </aside>
+    </section>
+    <div class="bottom"><span>Criptografia de transporte via conexão segura do navegador</span><span>Feito para conversas <strong>mais próximas.</strong></span></div>
+  </main>
+  <div class="toast" id="toast"></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+let screenStream = null, micStream = null, audioContext = null, analyser = null, meterFrame = null;
+function toast(message) {
+  $('toast').textContent = message;
+  $('toast').classList.add('show');
+  setTimeout(() => $('toast').classList.remove('show'), 2800);
+}
+async function shareScreen() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+    toast('Compartilhamento indisponível. Use Chrome, Edge ou Opera em uma conexão segura (HTTPS).'); return;
+  }
+  try {
+    screenStream = await navigator.mediaDevices.getDisplayMedia({
+      video: { frameRate: { ideal: 60, max: 60 } },
+      audio: true
+    });
+    $('screenVideo').srcObject = screenStream;
+    $('screenVideo').style.display = 'block';
+    $('emptyState').style.display = 'none';
+    $('screenStatus').textContent = 'Sua tela está sendo exibida';
+    $('shareBtn').innerHTML = '■ <span>Parar compartilhamento</span>';
+    screenStream.getVideoTracks()[0].addEventListener('ended', stopScreen);
+    toast('Tela compartilhada neste dispositivo.');
+  } catch (e) {
+    if (e.name !== 'AbortError') toast('Não foi possível compartilhar. Verifique a permissão do navegador.');
+  }
+}
+function stopScreen() {
+  if (screenStream) screenStream.getTracks().forEach(t => t.stop());
+  screenStream = null;
+  $('screenVideo').srcObject = null;
+  $('screenVideo').style.display = 'none';
+  $('emptyState').style.display = 'block';
+  $('screenStatus').textContent = 'Aguardando compartilhamento';
+  $('shareBtn').innerHTML = '▣ <span>Compartilhar</span>';
+}
+$('startShare').onclick = shareScreen;
+$('shareBtn').onclick = () => screenStream ? stopScreen() : shareScreen();
+$('copyCode').onclick = async () => {
+  try { await navigator.clipboard.writeText($('roomCode').textContent); toast('Código da sala copiado!'); }
+  catch { toast('Código: ' + $('roomCode').textContent); }
+};
+$('inviteBtn').onclick = async () => {
+  const invite = 'Entre na minha sala Clarity: ' + location.href + '\\nCódigo: ' + $('roomCode').textContent;
+  try { await navigator.clipboard.writeText(invite); toast('Convite copiado! Envie para a outra pessoa.'); }
+  catch { toast('Compartilhe o código: ' + $('roomCode').textContent); }
+};
+$('micBtn').onclick = async () => {
+  if (micStream) {
+    micStream.getTracks().forEach(t => t.stop()); micStream = null;
+    if (audioContext) { await audioContext.close(); audioContext = null; }
+    cancelAnimationFrame(meterFrame); $('meterFill').style.width = '0%';
+    $('micBtn').classList.remove('active'); $('selfMicStatus').textContent = 'Mic desligado';
+    $('audioLevel').textContent = 'Desativada'; toast('Microfone desligado'); return;
+  }
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});
+    $('micBtn').classList.add('active'); $('selfMicStatus').textContent = 'Mic ligado';
+    $('audioLevel').textContent = 'Captando'; toast('Microfone ativado neste dispositivo');
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioContext.createAnalyser(); analyser.fftSize = 256;
+    audioContext.createMediaStreamSource(micStream).connect(analyser);
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    function drawMeter() {
+      analyser.getByteFrequencyData(data);
+      const avg = data.reduce((a,b)=>a+b,0)/data.length;
+      $('meterFill').style.width = Math.min(100, avg*1.7)+'%';
+      meterFrame = requestAnimationFrame(drawMeter);
+    }
+    drawMeter();
+  } catch { toast('Permita o acesso ao microfone nas configurações do navegador.'); }
+};
+$('camBtn').onclick = async () => {
+  toast('A câmera poderá ser adicionada quando a sala estiver conectada entre dispositivos.');
+};
+$('leaveBtn').onclick = () => { stopScreen(); if(micStream) $('micBtn').click(); toast('Você saiu da visualização local.'); };
+if (!window.isSecureContext && location.hostname !== 'localhost') {
+  $('connectionText').textContent = 'Requer HTTPS';
+}
+</script>
+</body>
+</html>
